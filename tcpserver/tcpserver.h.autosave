@@ -1,0 +1,34 @@
+#ifndef TCPSERVER_H
+#define TCPSERVER_H
+
+#include <QObject>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QDebug>
+class tcpserver : public QObject
+{
+    Q_OBJECT
+public:
+    explicit tcpserver(QObject *parent = 0);
+
+signals:
+
+public slots:
+    void newclient(){
+        client = server->nextPendingConnection();//返回与客户端连接的对象
+        qDebug()<<"connect";
+        connect(client,SIGNAL(readyRead()),this,SLOT(readdate()));
+        //返回的对象如果有东西则调用读函数
+    }
+    void readdate(){
+        QByteArray buf = client->readAll();//读
+        qDebug()<<"recv"<<buf;
+        client->write(buf);//写回去
+    }
+
+private:
+    QTcpServer *server;//客户端和服务端声明不一样
+    QTcpSocket *client;
+};
+
+#endif // TCPSERVER_H
